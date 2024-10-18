@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lbpqc"
+authors = [
+    { name = "Mikołaj Leonhardt", email = "mikolaj.leonhardt@gmail.com" },
+]
+description = "A library of primitives for teaching lattice-based post-quantum cryptography"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "License :: OSI Approved :: The Unlicense (Unlicense)",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Education",
+    "Topic :: Security :: Cryptography",
+]
+version = "0.1"
+dependencies = ["numpy"]
+keywords = ["cryptography", "lattice", "NTRU", "LWE", "LWR", "GGH"]
+
+[project.urls]
+Repository = "https://github.com/mikolajlh/lbpqc.git"
+Documentation = "https://mikolajlh.github.io/lbpqc/"
