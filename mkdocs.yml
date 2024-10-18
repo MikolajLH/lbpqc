@@ -1,0 +1,42 @@
+site_name: lbpqc - docs
+
+repo_url: https://github.com/mikolajlh/lbpqc
+repo_name: mikolajlh/lbpqc
+edit_uri: blob/main/docs/
+
+nav:
+  - "index.md"
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+theme:
+  name: material
+  icon:
+    logo: material/shield-key
+  font:
+    text: Lato
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: white
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: black
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+watch:
+  - lbpqc
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
