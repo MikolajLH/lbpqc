@@ -1,6 +1,5 @@
 import numpy as np
 from lbpqc.primitives.polynomial.NTRU_polynomial_ring import *
-from lbpqc.primitives.polynomial import random
 
 
 
@@ -38,12 +37,7 @@ class Cryptosystem:
     
 
     def generate_key(self):
-        N, p, q, d = self.params
-
-        f = random.sample_ternary_polynomial_coeffs(N, d + 1, d)
-        g = random.sample_ternary_polynomial_coeffs(N, d, d)
-
-        return self.create_key(f, g)
+        assert False
 
 
     def encrypt(self, public_key: np.ndarray[int], plaintext: np.ndarray[int], noise: np.ndarray[int]):
