@@ -32,11 +32,11 @@ theme:
         icon: material/weather-sunny
         name: Switch to light mode
 watch:
-  - lbpqc
+  - src/lbpqc
 plugins:
   - search
   - mkdocstrings:
       default_handler: python
       handlers:
         python:
-          paths: [src]
+          paths: [./src]
