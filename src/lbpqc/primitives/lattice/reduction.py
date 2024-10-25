@@ -8,7 +8,7 @@ def gram_schmidt_process(basis: np.ndarray[float]) -> np.ndarray[float]:
     '''
     proj = lambda u,v: (np.dot(v,u) / np.dot(u,u)) * u
     n,_ = basis.shape
-    B = basis.copy()
+    B = basis.astype(float)
 
     new_basis = []
     for k in range(n):
@@ -42,7 +42,7 @@ def GLR_2dim(w1: np.ndarray, w2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return v1, v2
     
 
-def LLL(lattice_basis: np.ndarray, delta: float = 0.75):
+def LLLdep(lattice_basis: np.ndarray, delta: float = 0.75):
     '''
     Implementation of LLL latice reduction algorithm
     '''
@@ -64,3 +64,41 @@ def LLL(lattice_basis: np.ndarray, delta: float = 0.75):
             Bstar =  gram_schmidt_process(B)
             k = max(k-1, 2)
     return B
+
+
+# M = np.array([[19, 2, 32, 46, 3, 33], [15, 42, 11, 0, 3, 24], [43, 15, 0, 24, 4, 16], [20, 44, 44, 0, 18, 15], [0, 48, 35, 16, 31, 31], [48, 33, 32, 9, 1, 29]])
+# B = np.array([[1, -1, 3], [1, 0, 5], [1, 2, 6]])
+
+def LLL(lattice_basis: np.ndarray, delta: float = 0.75):
+    n = lattice.lattice_dim(lattice_basis)
+    B = lattice_basis.astype(float)
+    while True:
+        Bstar = gram_schmidt_process(B)
+        # Reduction Step
+        for i in range(1, n):
+            for j in range(i-1, -1, -1):
+                cij = round(np.dot(B[i], Bstar[j]) / np.dot(Bstar[j], Bstar[j]))
+                B[i] = B[i] - cij * B[j]
+        # Swap step
+        exists = False
+        for i in range(n - 1):
+            u = np.dot(B[i + 1], Bstar[i]) / np.dot(Bstar[i], Bstar[i])
+            r = u * Bstar[i] + Bstar[i + 1]
+            if delta * np.dot(Bstar[i], Bstar[i]) > np.dot(r, r):
+                B[[i, i + 1]] = B[[i + 1, i]]
+                exists = True
+                break
+        if not exists:
+            break
+    return B
+
+
+def babai_nearest_plane(lattice_basis: np.ndarray, w: np.ndarray):
+    n = lattice.lattice_dim(lattice_basis)
+    B = LLL(lattice_basis, 0.75)
+    b = w.astype(float)
+    for j in range(n - 1, -1, -1):
+        Bstar = gram_schmidt_process(B)
+        cj = round(np.dot(b, Bstar[j]) / np.dot(Bstar[j], Bstar[j]))
+        b = b - cj * B[j]
+    return w - b
