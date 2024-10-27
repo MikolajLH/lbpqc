@@ -56,7 +56,7 @@ extra_css:
 
 plugins:
   - search
-  - mknotebooks
+  - mkdocs-jupyter
   - mkdocstrings:
       default_handler: python
       handlers:
