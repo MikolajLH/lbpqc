@@ -5,7 +5,10 @@ repo_name: mikolajlh/lbpqc
 edit_uri: blob/main/docs/
 
 nav:
-  - "index.md"
+  - Home: "index.md"
+  - Examples:
+      - examples/attacking_congruential_pkc.ipynb
+      - examples/attacking_discrete_knapsack_pkc.ipynb
 validation:
   omitted_files: warn
   absolute_links: warn
@@ -31,10 +34,29 @@ theme:
       toggle:
         icon: material/weather-sunny
         name: Switch to light mode
+
 watch:
   - src/lbpqc
+
+markdown_extensions:
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - markdown.extensions.tables
+  - markdown.extensions.codehilite
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+
+extra_css:
+  - https://unpkg.com/katex@0/dist/katex.min.css
+
 plugins:
   - search
+  - mknotebooks
   - mkdocstrings:
       default_handler: python
       handlers:
