@@ -2,6 +2,7 @@ import numpy as np
 import lbpqc.primitives.polynomial.modulo_integer_polynomial_ring as mipr
 
 
+
 def reduce_coeffs_by_lwe_modulus_polynomial(N: int, coeffs: np.ndarray[int]):
     r'''
     Reducing powers of polynomial modulo N.
