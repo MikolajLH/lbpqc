@@ -119,3 +119,7 @@ def NTRU_lattice_basis(NTRU_params, NTRU_public_key: np.ndarray[int]):
     M_NTRU = np.block([[M11, M12], [M21, M22]])
 
     return M_NTRU
+
+
+def dual_lattice(lattice_base: np.ndarray):
+    return np.linalg.inv(lattice_base.T)
