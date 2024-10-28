@@ -22,7 +22,6 @@ v = np.array([16,9,6,8])
 cs = Cryptosystem(N,q,k)
 
 
-
 def test_create_key():
     priv, publ = cs.create_key(A,s,e)
     assert (priv == s).all()
