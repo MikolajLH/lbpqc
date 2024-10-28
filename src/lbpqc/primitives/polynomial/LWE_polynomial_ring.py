@@ -26,7 +26,6 @@ def lwe_poly_mul(N: int, modulus: int, a_coeffs: np.ndarray[int], b_coeffs: np.n
         reduce_coeffs_by_lwe_modulus_polynomial(N, mipr.poly_mod_mul(a_coeffs, b_coeffs, modulus)), modulus)
 
 
-
 def lwa_poly_add(N: int, modulus: int, a_coeffs: np.ndarray[int], b_coeffs: np.ndarray[int]) -> np.ndarray[int]:
     r'''
     Addition of two polynomials in a ring $\frac{\mathcal{Z}_{p}}{{X^N + 1}}\left[X\right]$.
