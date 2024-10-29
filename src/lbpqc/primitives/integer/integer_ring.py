@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 
 def eea_int(a: int, b: int) -> tuple[int, int, int]:
@@ -44,3 +45,19 @@ def is_unit(a: int, modulus: int) -> bool:
     Checks if element of a Integer Ring is a unit
     '''
     return gcd_int(a, modulus) == 1
+
+
+def LWR_rounding(a: int, p: int, q: int):
+    r'''
+    from Zq to Zp
+    '''
+    return math.floor((p/q) * a) % p
+LWR_rounding = np.vectorize(LWR_rounding)
+
+
+def center_reduce(a: int, modulus: int):
+    r'''
+    reduce integer a into interval (-modulus/2, modulus/2] ^ Z
+    '''
+    return (a % modulus) - math.floor((modulus - 1) / 2)
+center_reduce = np.vectorize(center_reduce)
