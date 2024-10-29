@@ -1,10 +1,10 @@
 from lbpqc.type_aliases import *
 from lbpqc.primitives.random import RNG
-from lbpqc.primitives.integer.integer_ring import LWR_rounding
+from lbpqc.primitives.integer.integer_ring import LWR_rounding, center_reduce
 
 class Cryptosystem():
     r'''
-    Deterministic Encryption
+    LWR-Based Fully Homomorphic Encryption, Revisited; page 5; 3. building_blocks
     '''
     def __init__(self, n: int, m: int, p: int, q: int, seed: int) -> None:
         self._rng = RNG(seed)
@@ -21,9 +21,9 @@ class Cryptosystem():
     
     def create_key(self):
         n, m, p, q = self.params
-        sprim = self.rng.sample_uniform_Zq(2, n)
-        A = self.rng.sample_uniform_Zq(q, (n, m))
-        b = LWR_rounding(sprim @ A, p, q)
+        sprim =  self.rng.sample_uniform_Zq(2, n)
+        A = center_reduce(self.rng.sample_uniform_Zq(q, (n, m)), q)
+        b = center_reduce(LWR_rounding(sprim @ A, p, q), p)
         A = np.block([[A], [b]])
         s = np.block([-p/q * sprim, 1])
 
@@ -38,11 +38,14 @@ class Cryptosystem():
         u = plaintext
         r = self.rng.sample_uniform_Zq(2, m)
         c = r @ A
-        c[:-1] %= q
-        c[-1] %= p
-        z = np.block([0, u * round(p/2)])
+        c[:-1] = center_reduce(c[:-1], q)
+        c[-1] = center_reduce(c[-1], p)
 
+        z = np.block([np.zeros(n, dtype=int), u * round(p/2)])
         c = c + z
+
+        c[:-1] = center_reduce(c[:-1], q)
+        c[-1] = center_reduce(c[-1], p)
 
         return c
     
