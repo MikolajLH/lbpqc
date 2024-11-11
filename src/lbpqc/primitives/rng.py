@@ -2,7 +2,7 @@ import numpy as np
 from lbpqc.primitives.lattice.reduction import *
 from lbpqc.primitives.lattice.full_rank_lattice import *
 from lbpqc.type_aliases import *
-
+from lbpqc.primitives.integer.prime import *
 
 
 class RNG:
@@ -45,3 +45,17 @@ class RNG:
     def random_Zq_subset(self, q: int):
         subset_size = self.rng.integers(0, q)
         return self.rng.choice(q, subset_size, replace=False)
+    
+
+    def random_prime(self, a: int, b: int, s: int = 1000):
+        assert b > a
+        # p in [a ... b]
+        for _ in range(s):
+            p = 2 * self.rng.integers(a//2, b//2) + 1
+            if miller_rabin_primality_test(p, 20):
+                return p
+        
+        assert False
+
+
+

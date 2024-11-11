@@ -1,8 +1,8 @@
 from lbpqc.type_aliases import *
-from lbpqc.primitives.random import RNG
+from lbpqc.primitives.rng import RNG
 from lbpqc.primitives.integer.integer_ring import LWR_rounding, center_reduce
 
-class Cryptosystem():
+class Cryptosystem:
     r'''
     LWR-Based Fully Homomorphic Encryption, Revisited; page 5; 3. building_blocks
     '''

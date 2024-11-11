@@ -1,5 +1,5 @@
 from lbpqc.type_aliases import *
-from lbpqc.primitives.random import RNG
+from lbpqc.primitives.rng import RNG
 
 class Cryptosystem:
     r'''

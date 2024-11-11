@@ -61,3 +61,14 @@ def center_reduce(a: int, modulus: int):
     '''
     return (a % modulus) - math.floor((modulus - 1) / 2)
 center_reduce = np.vectorize(center_reduce)
+
+
+
+def mod_pow(a: int, n: int, modulus: int):
+    assert n >= 0
+    y, z = 1, a
+    while n != 0:
+        if n % 2 == 1: y = (y * z) % modulus
+        n //= 2
+        z = (z * z) % modulus
+    return y
