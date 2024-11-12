@@ -4,6 +4,9 @@ import numpy as np
 
 
 def fermat_primality_test(p: int, s: int):
+    r'''
+    Fermat's primality test
+    '''
     if p in [2, 3, 5, 7]:
         return True
     for _ in range(s):
@@ -14,6 +17,9 @@ def fermat_primality_test(p: int, s: int):
 
 
 def miller_rabin_primality_test(p: int, s: int):
+    '''
+    Miller-Rabin primality test
+    '''
     if p in [2,3,5,7,11,13]:
         return True
     if p == 1 or p % 2 == 0 or p % 3 == 0 or p % 5 == 0:

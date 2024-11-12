@@ -9,12 +9,11 @@ nav:
   - Examples:
       - examples/attacking_congruential_pkc.ipynb
       - examples/attacking_discrete_knapsack_pkc.ipynb
-      - examples/attacking_low_exponent_RSA.ipynb
       - examples/constructing_and_attacking_GGH_pkc.ipynb
       - examples/constructing_and_attacking_NTRU_pkc.ipynb
-      - examples/constructing_LWE.ipynb
-      - examples/constructing_LWR.ipynb
-      - examples/constructing_ringLWE_pkc.ipynb
+  - Modules:
+      - Primitives: primitives.md
+      - Cryptosystems: cryptosystems.md
 validation:
   omitted_files: warn
   absolute_links: warn
@@ -68,3 +67,5 @@ plugins:
       handlers:
         python:
           paths: [./src]
+          options:
+            show_root_heading: true
