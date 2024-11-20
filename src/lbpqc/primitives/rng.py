@@ -19,6 +19,22 @@ class RNG:
         Access the underlying `numpy` rng object.
         '''
         return self._rng
+
+    def sample_discrete_gaussian(self, s: float, c: float, n: int, k: int = 100) -> int:
+        r'''
+        *How to Use a Short Basis: Trapdoors for Hard Lattices and New Cryptographic Constructions; page 14; 4.1 Sampling Integers;*
+        '''
+        gaussian = lambda x, s, c: np.exp((-np.pi * np.dot(x - c, x - c)) / (s * s))
+        t = np.log(n)
+        a = int(np.ceil(c - s * t))
+        b = int(np.floor(c + s * t))
+        for _ in range(k * int(np.ceil(t))):
+            x = self.rng.integers(a, b, endpoint=True)
+            if self.rng.random() < gaussian(x, s, c):
+                return x
+
+        raise RuntimeError("This shouldn't happen")
+
     
     
     def sample_naive_discrete_gaussian(self, q: int, alpha: float, size = None) -> int | VectorInt | MatrixInt:
