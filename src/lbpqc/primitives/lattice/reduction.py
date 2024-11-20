@@ -1,5 +1,5 @@
 import numpy as np
-from sympy.simplify.sqrtdenest import sqrt_depth
+
 
 from lbpqc.primitives.lattice import full_rank_lattice as lattice
 
