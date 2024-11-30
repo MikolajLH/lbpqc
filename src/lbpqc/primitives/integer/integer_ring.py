@@ -1,6 +1,7 @@
 import math
 import numpy as np
-
+from lbpqc.type_aliases import *
+from typing import Tuple
 
 def eea_int(a: int, b: int) -> tuple[int, int, int]:
     r'''
@@ -72,3 +73,41 @@ def mod_pow(a: int, n: int, modulus: int):
         n //= 2
         z = (z * z) % modulus
     return y
+
+
+
+def eea(a: int, b: int) -> Tuple[int,int,int]:
+    old_s, s = 1, 0
+    old_r, r = a, b
+    while r != 0:
+        q = old_r // r
+        old_r, r = r, old_r - q * r
+        old_s, s = s, old_s - q * s
+    
+    t = 0 if b == 0 else (old_r - old_s * a) // b
+    s = old_s
+    gcd = old_r
+    return gcd, s, t
+
+
+def modinv(a: int, modulus: int) -> ModInt:
+    return modular_inverse(a, modulus)
+
+
+def modpow(a: int, r: int, modulus: int) -> ModInt:
+    if r < 0:
+        return modpow(modinv(a, modulus), -r, modulus)
+    
+    y, z = 1, a
+    while r != 0:
+        if r % 2 == 1:
+            y = (y * z) % modulus
+        r //= 2
+        z = (z * z) % modulus
+    return y
+
+
+def center_lift(a: int, modulus: int) -> int:
+    return (a % modulus) - math.floor((modulus - 1) / 2)
+center_lift = np.vectorize(center_lift)
+
