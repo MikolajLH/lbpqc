@@ -1,8 +1,9 @@
-import numpy as np
-from lbpqc.primitives.lattice.reduction import *
-from lbpqc.primitives.lattice.full_rank_lattice import *
 from lbpqc.type_aliases import *
+
 from lbpqc.primitives.integer.prime import *
+
+import random
+import math
 
 
 class RNG:
@@ -11,14 +12,22 @@ class RNG:
         Initialize numpy rng with seed value.  
         Use `secrets.randbits(128)` for more cryptographicly secure rng.
         '''
-        self._rng = np.random.default_rng(seed)
+        self._nprng = np.random.default_rng(seed)
+        self._pyrng = random.Random(seed)
+        
+        
     
     @property
     def rng(self):
         r'''
         Access the underlying `numpy` rng object.
         '''
-        return self._rng
+        return self._nprng
+    
+    
+    def sample_rounded_gaussian(self, q, alpha, size) -> int | VectorInt | MatrixInt:
+        return np.rint(self.rng.normal(0, (q * alpha) / (2 * np.pi), size)).astype(int)
+    
 
     def sample_discrete_gaussian(self, s: float, c: float, n: int, k: int = 100) -> int:
         r'''
@@ -34,22 +43,9 @@ class RNG:
                 return x
 
         raise RuntimeError("This shouldn't happen")
+    
 
-    
-    
-    def sample_naive_discrete_gaussian(self, q: int, alpha: float, size = None) -> int | VectorInt | MatrixInt:
-        r'''
-        Sample from Discrete Gaussian Distribution defined as
-        normal distribution with **mean** zero and **standard deviation** $\alpha q$ that is **rounded to the nearest integer**.  
-        $\alpha > 0$ is generally taken such that $\alpha^{-1}$ is a polynomial in $n$, that is $\alpha \approx \frac{1}{n^{c}}$
-        for some constant $c$.
-
-        *Lattice-based cryptography; page 64; Definition 3.5 (Learning With Errors (LWE));*
-        '''
-        return np.rint(self.rng.normal(0, (q * alpha) / (2 * np.pi), size)).astype(int)
-    
-    
-    def sample_uniform_Zq(self, q: int, size : None | int | tuple[int,int] = None) -> ModInt | VectorMod | MatrixMod:
+    def sample_uniform_Zq(self, q: int, size : None | int | Tuple[int,int] = None) -> ModInt | VectorModInt | MatrixModInt:
         r'''
         Sample uniformly from $\mathbb{Z}_{q}$ ring.  
         If size is None, returns single element.  
@@ -58,20 +54,67 @@ class RNG:
         '''
         return self.rng.integers(0, q, size)
     
-    def random_Zq_subset(self, q: int):
+
+    def sample_Zq_subset(self, q: int) -> VectorModInt:
         subset_size = self.rng.integers(0, q)
         return self.rng.choice(q, subset_size, replace=False)
     
 
-    def random_prime(self, a: int, b: int, s: int = 1000):
-        assert b > a
-        # p in [a ... b]
-        for _ in range(s):
-            p = 2 * self.rng.integers(a//2, b//2) + 1
-            if miller_rabin_primality_test(p, 20):
-                return p
+    def sample_prime(self, a: int, b: int = None):
+        r'''
+        samples a random prime from interval [a, b)
+        number of primes in interval $(0, x]$ - $\pi(x) \approx \frac{x}{\log{x}}$
+        so number of primes in [a, b) is approximetly equal to $P = \frac{b}{\log{b}} - \frac{a}{\log{a}}$.
+        probabiliy of uniformly chosen integer from (a,b] being a prime - $p = \frac{P}{b - a}$
+
+        P(not getting prime) = 1 - p
+        P(not getting any prime in n trials) = (1 - p)^n
+        P(getting at least one prime in n trials) = 1 - (1 - p)^n
+        0.99 = 1 - (1 - p)^n
+        (1 - p)^n = 0.01
+        n = log(0.01, 1 - p)
+        n = ln(0.01)/ln(1 - p)
+
+        So in order to be 99% sure that some prime number was sampled, we need to perform n trials
+        where n = ln(0.01)/ln(1 - p)
+        '''
+        if b is None:
+            b = a
+            a = 0
+
+        if b <= a:
+            raise ValueError(f"[{a}, {b}) is not a proper interval")
         
-        assert False
+        if b <= 0:
+            raise ValueError(f"there are no prime numbers in interval [{a}, {b})")
+        
+        if a < 0:
+            a = 0
+
+        bigint_log = lambda n, b: int((n.bit_length() - 1) // math.log2(b))
+        
+        
+    
+        approx_number_of_primes = b // (math.log(b) if b.bit_length() < 512 else bigint_log(b, math.e))
+        if a != 0:
+            approx_number_of_primes -= a // (math.log(a) if a.bit_length() < 512 else bigint_log(a, math.e))
+        is_prime_probability = approx_number_of_primes / (b - a)
+
+        number_of_samples = int(math.log(0.01) / math.log(1 - is_prime_probability)) + 1
+
+        int_gen = (lambda a,b: self.rng.integers(a,b)) if b < 2 ** 63 - 1 else (lambda a,b: self._pyrng.randint(a, b - 1))
+
+        for _ in range(number_of_samples):
+            prime_candidate = int_gen(a,b)
+            if miller_rabin_primality_test(prime_candidate, 15, int_gen):
+                return prime_candidate
+        
+        raise ValueError("exceeded maximum number of trials for sampling a prime from [a, b)")
+
+    def sample_kbits_prime(self, kbits: int):
+        a = 2**(kbits - 1)
+        b = 2**kbits
+        return self.sample_prime(a, b)
 
 
 

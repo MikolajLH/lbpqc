@@ -1,79 +1,32 @@
-import math
-import numpy as np
-from lbpqc.type_aliases import *
 from typing import Tuple
+import math
 
-def eea_int(a: int, b: int) -> tuple[int, int, int]:
-    r'''
-    Function implementing extended Euclidean algorithm on integers.
-
-    It returns the gcd of a and b, as well as the coefficients (x, y) such that:
-    $$ ax + by = gcd(a, b) $$
-    '''
-    if b == 0:
-        return a, 1, 0
-    
-    gcd, x1, y1 = eea_int(b, a % b)
-    x = y1
-    y = x1 - (a // b) * y1
-    return gcd, x, y
+from lbpqc.type_aliases import *
 
 
-def modular_inverse(a: int, modulus: int):
-    r'''
-    Function finding modular multiplicative inverse $a'$ of $a$
-    such that $a' a \equiv 1 \mod(modulus)$
-
-    if the inverse does not exisit - $\gcd(a,modulus) \neq 1 $ raises an exception
-
-    uses extended Euclidean algorithm
-    '''
-    gcd, a_inv, _ = eea_int(a, modulus)
-    if gcd != 1:
-        raise ValueError(f"Modular inverse does not exist because gcd({a}, {modulus}) != 1")
-    return a_inv % modulus
-
-
-def gcd_int(a: int, b: int) -> int:
-    r'''
-    computes gcd of two integers
-    '''
-    return math.gcd(a,b)
-
-
-def is_unit(a: int, modulus: int) -> bool:
-    r'''
-    Checks if element of a Integer Ring is a unit
-    '''
-    return gcd_int(a, modulus) == 1
-
-
-def LWR_rounding(a: int, p: int, q: int):
+@np.vectorize
+def LWR_rounding(a: int, p: int, q: int) -> ModInt:
     r'''
     from Zq to Zp
     '''
     return math.floor((p/q) * a) % p
-LWR_rounding = np.vectorize(LWR_rounding)
 
 
-def center_reduce(a: int, modulus: int):
+@np.vectorize
+def mod_reduce(a: int, modulus: int) -> ModInt:
+    return a % modulus
+
+
+@np.vectorize
+def center_mod_reduce(a: int, modulus: int, right_inclusive: bool = True) -> CenteredModInt:
     r'''
-    reduce integer a into interval (-modulus/2, modulus/2] ^ Z
+    reduce integer $a$ into interval (-modulus/2, modulus/2] if right_inclusive is True
+    else reduce integer $a$ into interval [-modulus/2, modulus/2) 
     '''
-    return (a % modulus) - math.floor((modulus - 1) / 2)
-center_reduce = np.vectorize(center_reduce)
-
-
-
-def mod_pow(a: int, n: int, modulus: int):
-    assert n >= 0
-    y, z = 1, a
-    while n != 0:
-        if n % 2 == 1: y = (y * z) % modulus
-        n //= 2
-        z = (z * z) % modulus
-    return y
-
+    if right_inclusive:
+        return ((a + modulus // 2) % modulus) - modulus // 2
+    else:
+        return ((a + 1 + modulus // 2) % modulus) - modulus // 2 - 1
 
 
 def eea(a: int, b: int) -> Tuple[int,int,int]:
@@ -91,7 +44,11 @@ def eea(a: int, b: int) -> Tuple[int,int,int]:
 
 
 def modinv(a: int, modulus: int) -> ModInt:
-    return modular_inverse(a, modulus)
+    gcd, a_inv, _ = eea(a, modulus)
+    if gcd != 1:
+        raise ValueError("Modular inverse does not exist")
+    
+    return a_inv % modulus
 
 
 def modpow(a: int, r: int, modulus: int) -> ModInt:
@@ -107,7 +64,22 @@ def modpow(a: int, r: int, modulus: int) -> ModInt:
     return y
 
 
-def center_lift(a: int, modulus: int) -> int:
-    return (a % modulus) - math.floor((modulus - 1) / 2)
-center_lift = np.vectorize(center_lift)
 
+# class ModIntRing:
+#     def __init__(self, modulus: int) -> None:
+#         pass
+
+#     def reduce(self, a: int) -> ModInt:
+#         pass
+
+#     def center_reduce(self, a: int) -> CenteredModInt:
+#         pass
+
+#     def add(self, a, b) -> ModInt:
+#         pass
+
+#     def sub(self, a, b) -> ModInt:
+#         pass
+
+#     def inv(self, a) -> ModInt:
+#         pass
