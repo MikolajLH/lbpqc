@@ -1,58 +1,52 @@
-from typing import Tuple
-
 from lbpqc.type_aliases import *
 import lbpqc.primitives.polynomial.poly as poly
-from lbpqc.primitives.integer.integer_ring import modinv, center_lift
+from lbpqc.primitives.integer.integer_ring import modinv
 
 
 class ModIntPolyRing:
-    def __init__(self, modulus) -> None:
+    @enforce_type_check
+    def __init__(self, modulus: int) -> None:
         if modulus <= 1: raise ValueError("Modulus has to be greater than 1")
         self.modulus = modulus
 
     
-    def reduce(self, polynomial: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial): raise TypeError()
+    @enforce_type_check
+    def reduce(self, polynomial: VectorInt) -> VectorModInt:
 
         return poly.trim(polynomial % self.modulus)
     
 
+    @enforce_type_check
     def is_zero(self, polynomial: VectorInt) -> bool:
-        if not is_VectorInt(polynomial): raise TypeError()
 
         return poly.is_zero_poly(self.reduce(polynomial))
     
 
+    @enforce_type_check
     def deg(self, polynomial: VectorInt) -> int:
-        if not is_VectorInt(polynomial): raise TypeError()
 
         return poly.deg(self.reduce(polynomial))
 
 
-    def add(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
+    @enforce_type_check
+    def add(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorModInt:
 
         return self.reduce(poly.add(polynomial_a, polynomial_b))
 
-
-    def sub(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
+    @enforce_type_check
+    def sub(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorModInt:
 
         return self.reduce(poly.sub(polynomial_a, polynomial_b))
         
 
-    def mul(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
+    @enforce_type_check
+    def mul(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorModInt:
 
         return self.reduce(poly.mul(polynomial_a, polynomial_b))
-        
 
-    def euclidean_div(self,  polynomial_a: VectorInt, polynomial_b: VectorInt) -> Tuple[VectorMod, VectorMod]:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
+
+    @enforce_type_check
+    def euclidean_div(self,  polynomial_a: VectorInt, polynomial_b: VectorInt) -> Tuple[VectorModInt, VectorModInt]:
 
         if self.is_zero(polynomial_b): raise ZeroDivisionError("Can't divide by zero polynomial")
 
@@ -68,29 +62,26 @@ class ModIntPolyRing:
         
         return q, r
 
-    def rem(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
+
+    @enforce_type_check
+    def rem(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorModInt:
 
         if self.is_zero(polynomial_b): raise ZeroDivisionError("Can't divide by zero polynomial")
 
         _, r = self.euclidean_div(polynomial_a, polynomial_b)
         return r
 
-
-    def to_monic(self, polynomial: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial): raise TypeError()
-
+    @enforce_type_check
+    def to_monic(self, polynomial: VectorInt) -> VectorModInt:
+    
         leading_coeff = polynomial[self.deg(polynomial)]
 
         return self.reduce(modinv(leading_coeff, self.modulus) * polynomial)
 
 
-    def gcd(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
-
-
+    @enforce_type_check
+    def gcd(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorModInt:
+    
         r0 = self.reduce(polynomial_a)
         r1 = self.reduce(polynomial_b)
         if poly.deg(r1) > poly.deg(r0):
@@ -101,17 +92,16 @@ class ModIntPolyRing:
         
         return r0
 
+
+    @enforce_type_check
     def coprime(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> bool:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
 
         return np.all(self.to_monic(self.gcd(polynomial_a, polynomial_b)) == poly.monomial(1, 0))
     
 
-    def eea(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> Tuple[VectorMod, VectorMod, VectorMod]:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
-
+    @enforce_type_check
+    def eea(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> Tuple[VectorModInt, VectorModInt, VectorModInt]:
+        
         f0, f1 = self.reduce(polynomial_a), self.reduce(polynomial_b)
         a0, a1 = poly.monomial(1, 0), poly.zero_poly()
         b0, b1 = poly.zero_poly(), poly.monomial(1, 0)

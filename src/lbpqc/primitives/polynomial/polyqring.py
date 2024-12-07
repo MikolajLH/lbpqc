@@ -1,51 +1,53 @@
 from lbpqc.type_aliases import *
 
-import lbpqc.primitives.polynomial.modpoly as modpoly
-import lbpqc.primitives.polynomial.poly as poly
-
+from lbpqc.primitives.integer import integer_ring
+from lbpqc.primitives.polynomial import poly, modpoly
 
 
 class PolyQuotientRing:
+    @enforce_type_check
     def __init__(self, poly_modulus: VectorInt, int_modulus: int) -> None:
         self.poly_modulus = poly_modulus
         self.int_modulus = int_modulus
         self.Zm = modpoly.ModIntPolyRing(int_modulus)
+
+    
+    @property
+    def quotient(self):
+        return self.poly_modulus
     
 
-    def reduce(self, polynomial: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial): raise TypeError()
+    @enforce_type_check
+    def reduce(self, polynomial: VectorInt) -> VectorModInt:
         return self.Zm.rem(polynomial, self.poly_modulus)
         
 
-    def add(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
+    @enforce_type_check
+    def add(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorModInt:
 
         return self.reduce(self.Zm.add(polynomial_a, polynomial_b))
     
 
-    def sub(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
+    @enforce_type_check
+    def sub(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorModInt:
 
         return self.reduce(self.Zm.sub(polynomial_a, polynomial_b))
     
-
-    def mul(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial_a): raise TypeError()
-        if not is_VectorInt(polynomial_b): raise TypeError()
-
+    @enforce_type_check
+    def mul(self, polynomial_a: VectorInt, polynomial_b: VectorInt) -> VectorModInt:
+        
         return self.reduce(self.Zm.mul(polynomial_a, polynomial_b))
         
-
-    def inv(self, polynomial: VectorInt) -> VectorMod:
-        if not is_VectorInt(polynomial): raise TypeError()
-
+    @enforce_type_check
+    def inv(self, polynomial: VectorInt) -> VectorModInt:
+        
         if not self.Zm.coprime(polynomial, self.poly_modulus): raise ValueError("Inverse does not exists")
 
-        _, u, _ = self.Zm.eea(polynomial, self.poly_modulus)
-        return self.reduce(self.Zm.to_monic(u))
-    
+        gcd, u, _ = self.Zm.eea(polynomial, self.poly_modulus)
+
+        c = integer_ring.modinv(gcd, self.int_modulus)
+
+        return self.reduce(u * c)
 
 
 def from_ideal(p: str, N: int, q: int) -> PolyQuotientRing|None:
