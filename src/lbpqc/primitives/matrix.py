@@ -19,6 +19,15 @@ def elementary_row_add(n: int, i: int, j: int, s: int):
     E[i, j] = s
     return E
 
+def row_swap(M: MatrixInt, i: int, j: int):
+    M[[i,j]] = M[j,i]
+    
+def row_scale(M: MatrixInt, i: int, s: int):
+        M[i] *= s
+    
+def row_add(M: MatrixInt, i: int, k: int, s: int):
+    M[i] += s * M[k]
+
 
 def HNF(A: MatrixInt) -> Tuple[MatrixInt, SquareMatrixInt, int]:
     r'''
@@ -85,6 +94,7 @@ def HNF(A: MatrixInt) -> Tuple[MatrixInt, SquareMatrixInt, int]:
     return H, U, detU
 
 
+
 def nullity(A: MatrixInt) -> int:
     H, U, _ = HNF(A)
     r = 0
@@ -136,6 +146,85 @@ def matrix_modinv(A: SquareMatrixInt, modulus: int) -> SquareMatrixModInt:
     det_inv = integer_ring.modinv(det(A), modulus)
 
     return (det_inv * C.T) % modulus
+
+
+def mod_REF(A: MatrixInt, modulus: int) -> Tuple[MatrixModInt, SquareMatrixModInt]:
+    m, n = A.shape
+    inv = lambda a: integer_ring.modinv(a, modulus)
+
+    M = A.copy()
+    M %= modulus
+
+    U = np.identity(m, dtype=int)
+    
+    for j in range(min(m,n)):
+        col = M[ : ,j]
+        nonzero = np.nonzero(col[j:])[0]
+        if len(nonzero) == 0:
+            # no pivot, in this column
+            continue
+        pivot_i = nonzero[0] + j
+
+
+        if pivot_i != j:
+            row_swap(M, pivot_i, j)
+            U = (elementary_row_swap(m, pivot_i, j) @ U) % modulus
+        
+
+        pivot_inv = inv(M[j,j])
+        row_scale(M, j, pivot_inv)
+        U = (elementary_row_mul(m, j, pivot_inv) @ U) % modulus
+
+        M %= modulus
+
+
+        for i in range(j + 1, m):
+            if M[i, j] != 0:
+                U = (elementary_row_add(m, i, j, -M[i,j]) @ U) % modulus
+                row_add(M, i, j, -M[i,j])
+                M %= modulus
+    
+    return M % modulus, U % modulus
+
+
+def mod_RREF(A: MatrixInt, modulus: int) -> Tuple[MatrixModInt, SquareMatrixModInt]:
+    M, U = mod_REF(A, modulus)
+    m, n = M.shape
+
+    h = m - 1
+    for j in range(n - 1, -1, -1):
+        # check if current column is a pivot column
+        if M[h, j] != 1:
+            # skip zero rows at the bottom
+            if M[h, j] == 0:
+                h -= 1
+            continue
+        
+        # reduce column's entries below pivot
+        for i in range(h - 1, -1, -1):
+            coeff = M[i,j]
+            row_add(M, i, h, -coeff)
+            U = elementary_row_add(m, i, h, -coeff) @ U
+        
+        # move to the next row
+        h -= 1
+        
+        
+    return M % modulus, U % modulus
+
+
+def mod_left_kernel(A: MatrixInt, modulus: int) -> MatrixInt|None:
+    G, U = mod_RREF(A, modulus)
+    r = 0
+    for row in G[::-1]:
+        if np.all(row == 0):
+            r += 1
+        else:
+            break
+    if r == 0:
+        return None
+    return U[-r::]
+
 
 
 def q_ary_lattice_basis(A: MatrixInt, modulus: int) -> SquareMatrixInt:

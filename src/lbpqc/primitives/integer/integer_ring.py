@@ -46,7 +46,7 @@ def eea(a: int, b: int) -> Tuple[int,int,int]:
 def modinv(a: int, modulus: int) -> ModInt:
     gcd, a_inv, _ = eea(a, modulus)
     if gcd != 1:
-        raise ValueError("Modular inverse does not exist")
+        raise ValueError(f"Modular inverse of {a} mod {modulus} does not exist gcd is equal to {gcd}")
     
     return a_inv % modulus
 
