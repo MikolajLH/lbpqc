@@ -13,7 +13,6 @@ nav:
       - examples/constructing_and_attacking_NTRU_pkc.ipynb
   - Modules:
       - Primitives: primitives.md
-      - Cryptosystems: cryptosystems.md
 validation:
   absolute_links: warn
   unrecognized_links: warn
