@@ -6,5 +6,3 @@
 
 ## ::: lbpqc.primitives.integer.prime
 
-
-## ::: lbpqc.primitives.integer.matrix

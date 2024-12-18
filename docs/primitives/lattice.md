@@ -1,7 +1,10 @@
 # Lattice
 
 
-## ::: lbpqc.primitives.lattice.full_rank_lattice
+## ::: lbpqc.primitives.lattice.fullrank
 
 
-## ::: lbpqc.primitives.lattice.reduction
+## ::: lbpqc.primitives.lattice.reductions
+
+
+## ::: lbpqc.primitives.lattice.embeddings
