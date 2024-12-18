@@ -1,1 +1,0 @@
-::: lbpqc.cryptosystems.discret_knapsack_pkc.Cryptosystem

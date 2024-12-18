@@ -1,1 +1,0 @@
-::: lbpqc.cryptosystems.GGH_pkc.Cryptosystem
