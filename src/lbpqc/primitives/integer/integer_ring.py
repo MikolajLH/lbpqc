@@ -5,7 +5,7 @@ from lbpqc.type_aliases import *
 
 
 @np.vectorize
-def LWR_rounding(a: int, p: int, q: int) -> ModInt:
+def LWR_rounding(a: int, q: int, p: int) -> ModInt:
     r'''
     from Zq to Zp
     '''

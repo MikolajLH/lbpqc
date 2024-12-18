@@ -20,7 +20,7 @@ def elementary_row_add(n: int, i: int, j: int, s: int):
     return E
 
 def row_swap(M: MatrixInt, i: int, j: int):
-    M[[i,j]] = M[j,i]
+    M[[i,j]] = M[[j,i]]
     
 def row_scale(M: MatrixInt, i: int, s: int):
         M[i] *= s
@@ -158,6 +158,8 @@ def mod_REF(A: MatrixInt, modulus: int) -> Tuple[MatrixModInt, SquareMatrixModIn
     U = np.identity(m, dtype=int)
     
     for j in range(min(m,n)):
+        #print(f"j= {j}")
+        #print(M)
         col = M[ : ,j]
         nonzero = np.nonzero(col[j:])[0]
         if len(nonzero) == 0:
@@ -165,17 +167,28 @@ def mod_REF(A: MatrixInt, modulus: int) -> Tuple[MatrixModInt, SquareMatrixModIn
             continue
         pivot_i = nonzero[0] + j
 
+        #print("current column:")
+        #print(col)
+        #print(f"pivot index: {pivot_i}")
+        #print(f"pivot value: {M[pivot_i, j]}")
 
+        
         if pivot_i != j:
             row_swap(M, pivot_i, j)
             U = (elementary_row_swap(m, pivot_i, j) @ U) % modulus
+
+        #print("After swap")
+        #print(M)
         
 
         pivot_inv = inv(M[j,j])
         row_scale(M, j, pivot_inv)
         U = (elementary_row_mul(m, j, pivot_inv) @ U) % modulus
-
+        
         M %= modulus
+
+        #print("After scale")
+        #print(M)
 
 
         for i in range(j + 1, m):
@@ -183,6 +196,10 @@ def mod_REF(A: MatrixInt, modulus: int) -> Tuple[MatrixModInt, SquareMatrixModIn
                 U = (elementary_row_add(m, i, j, -M[i,j]) @ U) % modulus
                 row_add(M, i, j, -M[i,j])
                 M %= modulus
+        
+        #print("After reduce")
+        #print(M)
+        #print("===============")
     
     return M % modulus, U % modulus
 
@@ -248,3 +265,14 @@ def q_ary_lattice_basis(A: MatrixInt, modulus: int) -> SquareMatrixInt:
     print(B22)
 
     return np.block([[B11, B12], [B21, B22]])
+
+
+
+def dual_q_ary_lattice_basis(A: MatrixInt, modulus: int) -> SquareMatrixModInt:
+    m, n = A.shape
+    Y = mod_left_kernel(A, modulus)
+    assert Y.shape == (m - n, m)
+
+    q = modulus
+    return np.block([[Y], [np.zeros((m-n, m-n), dtype=int), q * np.identity(n, dtype=int)]])
+

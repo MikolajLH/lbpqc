@@ -1,6 +1,7 @@
 from lbpqc.type_aliases import *
 
 from lbpqc.primitives.integer.prime import *
+from lbpqc.primitives.integer import integer_ring
 
 import random
 import math
@@ -25,7 +26,7 @@ class RNG:
         return self._nprng
     
     
-    def sample_rounded_gaussian(self, q, alpha, size) -> int | VectorInt | MatrixInt:
+    def sample_rounded_gaussian(self, q, alpha, size = None) -> int | VectorInt | MatrixInt:
         return np.rint(self.rng.normal(0, (q * alpha) / (2 * np.pi), size)).astype(int)
     
 
@@ -54,6 +55,47 @@ class RNG:
         '''
         return self.rng.integers(0, q, size)
     
+
+    def _get_dist(self, name: str, *args):
+        match name:
+            case 'rounded':
+                return self.sample_rounded_gaussian(*args)
+            case 'discrete':
+                return self.sample_discrete_gaussian(*args)
+
+        raise ValueError(f"Unknown distribution {name}")
+    
+
+    def LWE_dist(self, q: int, s: VectorInt, m: int, err_dist: str, *args) -> Tuple[MatrixModInt, VectorInt]:
+        n = s.shape[0]
+    
+        e = np.array([self._get_dist(err_dist, *args) for _ in range(m)])
+        A = self.sample_uniform_Zq(q, (m, n))
+        b = A @ s + e
+        return A, b
+    
+    
+    def row_LWE_dist(self, q: int, s: VectorInt, err_dist: str, *args) -> Tuple[VectorInt, int]:
+        n = s.shape[0]
+        e = self._get_dist(err_dist, *args)
+        a = self.sample_uniform_Zq(q, n)
+        b = np.dot(a, s)
+        return a, b
+    
+
+    def LWR_dist(self, q: int, p: int, s: VectorInt, m :int) -> Tuple[MatrixModInt, VectorModInt]:
+        n = s.shape[0]
+        A = self.sample_uniform_Zq(q, (m, n))
+        b = integer_ring.LWR_rounding(A @ s, q, p)
+        return A, b
+    
+
+    def row_LWR_dist(self, q: int, p: int, s: VectorInt) -> Tuple[VectorInt, ModInt]:
+        n = s.shape[0]
+        a = self.sample_uniform_Zq(q, n)
+        b = integer_ring.LWR_rounding(np.dot(a, s), q, p)
+        return a, b
+
 
     def sample_Zq_subset(self, q: int) -> VectorModInt:
         subset_size = self.rng.integers(0, q)
@@ -110,6 +152,7 @@ class RNG:
                 return prime_candidate
         
         raise ValueError("exceeded maximum number of trials for sampling a prime from [a, b)")
+
 
     def sample_kbits_prime(self, kbits: int):
         a = 2**(kbits - 1)
