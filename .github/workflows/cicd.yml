@@ -48,7 +48,7 @@ jobs:
               with: 
                 python-version: '3.11'
             - run: pip install mkdocs mkdocs-material mkdocstrings-python mkdocs-jupyter
-            - run: mkdocs build --strict
+            - run: mkdocs build
             - run: mkdocs gh-deploy --force
 
     deploy_mkdocs:

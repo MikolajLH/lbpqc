@@ -22,6 +22,11 @@ class RNG:
     def rng(self):
         r'''
         Access the underlying `numpy` rng object.
+
+        Args:
+
+        Returns:
+    
         '''
         return self._nprng
     
@@ -33,6 +38,11 @@ class RNG:
     def sample_discrete_gaussian(self, s: float, c: float, n: int, k: int = 100) -> int:
         r'''
         *How to Use a Short Basis: Trapdoors for Hard Lattices and New Cryptographic Constructions; page 14; 4.1 Sampling Integers;*
+
+        Args:
+
+        Returns:
+    
         '''
         gaussian = lambda x, s, c: np.exp((-np.pi * np.dot(x - c, x - c)) / (s * s))
         t = np.log(n)
@@ -52,6 +62,11 @@ class RNG:
         If size is None, returns single element.  
         If size is an int, returns vector (1 dim np.ndarray) with given size.  
         If size is a tuple, returns matrix (2 dim np.ndarray) with given shape.
+
+        Args:
+
+        Returns:
+    
         '''
         return self.rng.integers(0, q, size)
     
@@ -67,6 +82,13 @@ class RNG:
     
 
     def LWE_dist(self, q: int, s: VectorInt, m: int, err_dist: str, *args) -> Tuple[MatrixModInt, VectorInt]:
+        r'''
+
+        Args:
+
+        Returns:
+    
+        '''
         n = s.shape[0]
     
         e = np.array([self._get_dist(err_dist, *args) for _ in range(m)])
@@ -76,6 +98,13 @@ class RNG:
     
     
     def row_LWE_dist(self, q: int, s: VectorInt, err_dist: str, *args) -> Tuple[VectorInt, int]:
+        r'''
+
+        Args:
+
+        Returns:
+    
+        '''
         n = s.shape[0]
         e = self._get_dist(err_dist, *args)
         a = self.sample_uniform_Zq(q, n)
@@ -84,6 +113,13 @@ class RNG:
     
 
     def LWR_dist(self, q: int, p: int, s: VectorInt, m :int) -> Tuple[MatrixModInt, VectorModInt]:
+        r'''
+
+        Args:
+
+        Returns:
+    
+        '''
         n = s.shape[0]
         A = self.sample_uniform_Zq(q, (m, n))
         b = integer_ring.LWR_rounding(A @ s, q, p)
@@ -91,6 +127,13 @@ class RNG:
     
 
     def row_LWR_dist(self, q: int, p: int, s: VectorInt) -> Tuple[VectorInt, ModInt]:
+        r'''
+
+        Args:
+
+        Returns:
+    
+        '''
         n = s.shape[0]
         a = self.sample_uniform_Zq(q, n)
         b = integer_ring.LWR_rounding(np.dot(a, s), q, p)
@@ -98,6 +141,13 @@ class RNG:
 
 
     def sample_Zq_subset(self, q: int) -> VectorModInt:
+        r'''
+
+        Args:
+
+        Returns:
+    
+        '''
         subset_size = self.rng.integers(0, q)
         return self.rng.choice(q, subset_size, replace=False)
     
@@ -119,6 +169,11 @@ class RNG:
 
         So in order to be 99% sure that some prime number was sampled, we need to perform n trials
         where n = ln(0.01)/ln(1 - p)
+
+        Args:
+
+        Returns:
+    
         '''
         if b is None:
             b = a
@@ -155,6 +210,13 @@ class RNG:
 
 
     def sample_kbits_prime(self, kbits: int):
+        r'''
+
+        Args:
+
+        Returns:
+    
+        '''
         a = 2**(kbits - 1)
         b = 2**kbits
         return self.sample_prime(a, b)

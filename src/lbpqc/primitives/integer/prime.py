@@ -6,12 +6,20 @@ import random
 SMALL_PRIMES = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251)
 
 
-def fermat_primality_test(p: int, s: int, int_gen):
-    r'''
-    Fermat's primality test
+def fermat_primality_test(p: int, s: int, int_gen= None):
+    r'''Fermat's primality test
+
+    Args:
+        p:.
+        s:.
+        int_gen.
     '''
+
     if p in SMALL_PRIMES:
         return True
+    
+    if int_gen is None:
+        int_gen = lambda a, b: random.randint(a, b - 1)
     
     for _ in range(s):
         a = int_gen(2, p - 2)
@@ -20,15 +28,26 @@ def fermat_primality_test(p: int, s: int, int_gen):
     return True
 
 
-def miller_rabin_primality_test(p: int, s: int, int_gen):
-    '''
-    Miller-Rabin primality test
+def miller_rabin_primality_test(p: int, s: int, int_gen= None):
+    r''' Miller-Rabin primality test
+
+    Args:
+        p:.
+        s:.
+        int_gen:.
+
+    Returns:
+        .
     '''
     if p in SMALL_PRIMES:
         return True
     
     if p == 1 or p % 2 == 0 or p % 3 == 0 or p % 5 == 0:
         return False
+    
+    if int_gen is None:
+        int_gen = lambda a, b: random.randint(a, b - 1)
+
     u = 0
     r = p - 1
     while r % 2 == 0:
@@ -49,6 +68,15 @@ def miller_rabin_primality_test(p: int, s: int, int_gen):
     
 
 def is_prime(p: int) -> bool:
+    r'''
+    Equivalent to `miller_rabin_primality_test(p, 20)`.
+
+    Args:
+        p: Prime candidate.
+
+    Returns:
+        True if p is prime (at least according to miller rabin test) False otherwise.
+    '''
 
     if p in SMALL_PRIMES:
         return True

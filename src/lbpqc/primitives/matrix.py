@@ -4,34 +4,81 @@ from lbpqc.type_aliases import *
 
 
 def elementary_row_swap(n: int, i: int, j: int):
+    r'''
+
+    Args:
+
+    Returns:
+
+    '''
     E = np.identity(n, int)
     E[[i,j]] = E[[j, i]]
     return E
 
 def elementary_row_mul(n: int, i: int, s: int):
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     E = np.identity(n, int)
     E[i, i] = s
     return E
 
 
 def elementary_row_add(n: int, i: int, j: int, s: int):
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     E = np.identity(n, int)
     E[i, j] = s
     return E
 
 def row_swap(M: MatrixInt, i: int, j: int):
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     M[[i,j]] = M[[j,i]]
     
 def row_scale(M: MatrixInt, i: int, s: int):
-        M[i] *= s
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
+    M[i] *= s
     
 def row_add(M: MatrixInt, i: int, k: int, s: int):
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     M[i] += s * M[k]
 
 
 def HNF(A: MatrixInt) -> Tuple[MatrixInt, SquareMatrixInt, int]:
     r'''
     Computes row-style Hermite Normal Form of a integer matrix A.
+
+    Args:
+
+    Returns:
+    
     '''
     H = A.copy()
     m, n = H.shape
@@ -96,6 +143,13 @@ def HNF(A: MatrixInt) -> Tuple[MatrixInt, SquareMatrixInt, int]:
 
 
 def nullity(A: MatrixInt) -> int:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     H, U, _ = HNF(A)
     r = 0
     for row in H[::-1]:
@@ -107,6 +161,13 @@ def nullity(A: MatrixInt) -> int:
 
 
 def left_kernel(A: MatrixInt) -> MatrixInt|None:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     H, U, _ = HNF(A)
     r = 0
     for row in H[::-1]:
@@ -120,19 +181,47 @@ def left_kernel(A: MatrixInt) -> MatrixInt|None:
 
 
 def det(A: SquareMatrixInt) -> int:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     H, U, detU = HNF(A)
     return np.prod(np.diagonal(H)) * detU
 
 
 def minor(A: SquareMatrixInt, i: int, j: int) -> int:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     return det(np.delete(np.delete(A, i, axis=0), j, axis=1))
 
 
 def cofactor(A: SquareMatrixInt, i: int, j: int) -> int:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     return minor(A, i, j) * ((-1) ** (i + 1 + j + 1))
 
 
 def cofactor_matrix(A: SquareMatrixInt) -> SquareMatrixInt:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     n = A.shape[0]
     C = np.zeros((n,n), dtype=int)
     for i in range(n):
@@ -142,6 +231,13 @@ def cofactor_matrix(A: SquareMatrixInt) -> SquareMatrixInt:
 
 
 def matrix_modinv(A: SquareMatrixInt, modulus: int) -> SquareMatrixModInt:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     C = cofactor_matrix(A) % modulus
     det_inv = integer_ring.modinv(det(A), modulus)
 
@@ -149,6 +245,13 @@ def matrix_modinv(A: SquareMatrixInt, modulus: int) -> SquareMatrixModInt:
 
 
 def mod_REF(A: MatrixInt, modulus: int) -> Tuple[MatrixModInt, SquareMatrixModInt]:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     m, n = A.shape
     inv = lambda a: integer_ring.modinv(a, modulus)
 
@@ -205,6 +308,13 @@ def mod_REF(A: MatrixInt, modulus: int) -> Tuple[MatrixModInt, SquareMatrixModIn
 
 
 def mod_RREF(A: MatrixInt, modulus: int) -> Tuple[MatrixModInt, SquareMatrixModInt]:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     M, U = mod_REF(A, modulus)
     m, n = M.shape
 
@@ -231,6 +341,13 @@ def mod_RREF(A: MatrixInt, modulus: int) -> Tuple[MatrixModInt, SquareMatrixModI
 
 
 def mod_left_kernel(A: MatrixInt, modulus: int) -> MatrixInt|None:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     G, U = mod_RREF(A, modulus)
     r = 0
     for row in G[::-1]:
@@ -245,6 +362,13 @@ def mod_left_kernel(A: MatrixInt, modulus: int) -> MatrixInt|None:
 
 
 def q_ary_lattice_basis(A: MatrixInt, modulus: int) -> SquareMatrixInt:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     m, n = A.shape
     assert n >= m
     # A = (A1 | A2)
@@ -269,6 +393,13 @@ def q_ary_lattice_basis(A: MatrixInt, modulus: int) -> SquareMatrixInt:
 
 
 def dual_q_ary_lattice_basis(A: MatrixInt, modulus: int) -> SquareMatrixModInt:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     m, n = A.shape
     Y = mod_left_kernel(A, modulus)
     assert Y.shape == (m - n, m)
