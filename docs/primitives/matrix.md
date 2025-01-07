@@ -1,3 +1,0 @@
-# Matrix
-
-## ::: lbpqc.primitives.matrix

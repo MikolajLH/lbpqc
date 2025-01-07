@@ -3,6 +3,13 @@ from lbpqc.type_aliases import *
 
 @enforce_type_check
 def GSO(B: Matrix) -> Tuple[MatrixFloat, SquareMatrixFloat]:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     m, n = B.shape
     proj_coeff = lambda q, b: np.dot(b, q) / np.dot(q, q)
     B_star = B.astype(float)
@@ -19,6 +26,13 @@ def GSO(B: Matrix) -> Tuple[MatrixFloat, SquareMatrixFloat]:
 
 
 def is_size_reduced(lattice_basis: Matrix) -> bool:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     _, U = GSO(lattice_basis)
     return np.all(np.abs(U[np.fromfunction(lambda i, j: i < j, U.shape).nonzero()]) <= 0.5)
 
@@ -29,6 +43,13 @@ def is_basis_vector_size_reduced(lattice_basis: Matrix, k: int) -> bool:
 
 
 def lovasz_condition(lattice_basis: Matrix, delta: float) -> bool:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     norm2 = lambda x: np.sum(x * x, axis=1)
     G, U = GSO(lattice_basis)
     lhs = delta * norm2(G[:-1])
@@ -37,6 +58,13 @@ def lovasz_condition(lattice_basis: Matrix, delta: float) -> bool:
 
 
 def is_LLL_reduced(lattice_basis: Matrix, delta: float):
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     return is_size_reduced(lattice_basis) and lovasz_condition(lattice_basis, delta)
 
 
@@ -67,6 +95,13 @@ def size_reduction(lattice_basis: Matrix):
 
 
 def LLL(lattice_basis: SquareMatrix, delta: float = 0.75) -> SquareMatrixFloat:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     n = lattice_basis.shape[0]
     B = lattice_basis.astype(float)
     while True:
@@ -91,6 +126,13 @@ def LLL(lattice_basis: SquareMatrix, delta: float = 0.75) -> SquareMatrixFloat:
 
 
 def babai_nearest_plane(lattice_basis: SquareMatrix, w: VectorFloat):
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     n = lattice_basis.shape[0]
     B = LLL(lattice_basis, 0.75)
     b = w.astype(float)
@@ -105,6 +147,11 @@ def babai_nearest_plane(lattice_basis: SquareMatrix, w: VectorFloat):
 def GLR_2dim(lattice_basis: SquareMatrix) -> SquareMatrixFloat:
     '''
     Gaussian Lattice reduction in dimension 2
+
+    Args:
+
+    Returns:
+    
     '''
     if lattice_basis.shape != (2,2):
         raise ValueError(f"Lattice has to have rank 2 for gaussian reduction")
@@ -179,6 +226,13 @@ def _enumerate(basis: SquareMatrixFloat, gs_basis: SquareMatrixFloat, coeff: np.
 
 
 def SVP(basis: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[int]]:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     n, m = basis.shape
     gs_basis, coeff = GSO(basis)
     R = np.dot(basis[0], basis[0])
@@ -193,6 +247,13 @@ def SVP(basis: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray, np.ndarray, n
 
 
 def projected_lattice(basis: SquareMatrix, start: int, end: int) -> SquareMatrixFloat:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     proj_basis = []
     gs_basis, coeff = GSO(basis)
     for i in range(start, end):
@@ -204,6 +265,13 @@ def projected_lattice(basis: SquareMatrix, start: int, end: int) -> SquareMatrix
 
 
 def lleaving_basis_vector(basis: SquareMatrix, combination: list[int]) -> int:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     r = 0
     idx = -1
     for i in range(len(basis)):
@@ -215,6 +283,13 @@ def lleaving_basis_vector(basis: SquareMatrix, combination: list[int]) -> int:
 
 
 def BKZ(basis: SquareMatrix, block_size: int) -> SquareMatrixFloat:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     n, m = basis.shape
     block_size = min(block_size, n)
     B = LLL(basis.astype(float))
@@ -239,6 +314,13 @@ def BKZ(basis: SquareMatrix, block_size: int) -> SquareMatrixFloat:
 
 
 def HKZ(basis: SquareMatrix) -> SquareMatrixFloat:
+    r'''
+
+    Args:
+
+    Returns:
+    
+    '''
     n, m = basis.shape
     B = LLL(basis.astype(float))
     for i in range(n):

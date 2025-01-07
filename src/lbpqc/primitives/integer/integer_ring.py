@@ -7,29 +7,76 @@ from lbpqc.type_aliases import *
 @np.vectorize
 def LWR_rounding(a: int, q: int, p: int) -> ModInt:
     r'''
-    from Zq to Zp
+    **LWR** rounding function, that maps elements from $\mathbb{Z}_q$ to elements from $\mathbb{Z}_p$ for some positive integers $p$ and $q$.
+
+    Args:
+        a: Integer to be rounded.
+        q: Modulus of domain ring $\mathbb{Z}_q$.
+        p: Modulus of codomain ring $\mathbb{Z}_p$.
+    
+    Returns:
+        Integer $c \in [0,p)$.
     '''
     return math.floor((p/q) * a) % p
 
 
 @np.vectorize
-def mod_reduce(a: int, modulus: int) -> ModInt:
-    return a % modulus
+def mod_reduce(a: int, m: int) -> ModInt:
+    r'''
+    Reduces integer $a$ to it's equivalence class modulo $m$ represented as integer in the interval $[0,m)$.
+    
+    Args:
+        a: integer or numpy array to be reduced.
+        m: positive modulus for the congruence relation.
+    
+    Returns:
+        Integer or numpy array with entries from interval $[0, \text{m})$.
+    '''
+    return a % m
 
 
 @np.vectorize
-def center_mod_reduce(a: int, modulus: int, right_inclusive: bool = True) -> CenteredModInt:
+def center_mod_reduce(a: int, m: int, right_closed: bool = True) -> CenteredModInt:
     r'''
-    reduce integer $a$ into interval (-modulus/2, modulus/2] if right_inclusive is True
-    else reduce integer $a$ into interval [-modulus/2, modulus/2) 
+    Reduces integer $a$ to it's equivalence class modulo $m$ represented as an interval **centered around zero**.
+    Depending on the `right_closed` parameter, the interval is either
+    $$
+    \left(-\frac{m}{2}, \frac{m}{2}\right]
+    $$
+    or
+    $$
+    \left[-\frac{m}{2}, \frac{m}{2}\right)
+    $$
+
+    Args:
+        a: integer or numpy array to be reduced.
+        m: positive modulus for the congruence relation.
+        right_closed: parameter deciding which side of half-open interval is closed.
+    
+    Returns:
+        Integer or numpy array with entries reduced around zero.
     '''
-    if right_inclusive:
-        return ((a + modulus // 2) % modulus) - modulus // 2
+    if right_closed:
+        return ((a + m // 2) % m) - m // 2
     else:
-        return ((a + 1 + modulus // 2) % modulus) - modulus // 2 - 1
+        return ((a + 1 + m // 2) % m) - m // 2 - 1
 
 
 def eea(a: int, b: int) -> Tuple[int,int,int]:
+    r'''
+    Implementation of **extended Euclidean algorithm**, i.e. algorithm that for integers $a$ and $b$ computes their $\gcd$ and
+    coefficients of **Bézout's identity**, which are integers $s$ and $t$ such that
+    $$
+    sa + tb = \gcd(a,b)
+    $$
+
+    Args:
+        a: integer a.
+        b: integer b.
+    
+    Returns:
+        Tuple (gcd(a,b), s, t).
+    '''
     old_s, s = 1, 0
     old_r, r = a, b
     while r != 0:
@@ -44,6 +91,19 @@ def eea(a: int, b: int) -> Tuple[int,int,int]:
 
 
 def modinv(a: int, modulus: int) -> ModInt:
+    r'''Computes multiplicative modular inverse of integer $a$ for a given modulus.
+    If the inverse does not exists, i.e. $\gcd(a, \text{modulus}) \neq 1$ then raises `ValueError`.
+
+    Args:
+        a: integer, which inverse we want to calculate.
+        modulus: positive modulus.
+    
+    Returns:
+        Integer $r$ from interval $[0, \text{modulus})$ that satisfies $a \cdot r \equiv 1 \mod \text{modulus}$.
+    
+    Raises:
+        ValueError: If $\gcd(a, \text{modulus}) \neq 1$.
+    '''
     gcd, a_inv, _ = eea(a, modulus)
     if gcd != 1:
         raise ValueError(f"Modular inverse of {a} mod {modulus} does not exist gcd is equal to {gcd}")
@@ -52,6 +112,21 @@ def modinv(a: int, modulus: int) -> ModInt:
 
 
 def modpow(a: int, r: int, modulus: int) -> ModInt:
+    r'''Computes
+    $$
+    a^{r} \mod \text{modulus}
+    $$
+    using *multiply and halve* powering algorithm for groups.
+
+    Args:
+        a: Base.
+        r: Exponent.
+        modulus: Positive modulus.
+    
+    Returns:
+        Integer $c \in [0, \text{modulus})$ such that $c \equiv a^r \mod \text{modulus}$.
+
+    '''
     if r < 0:
         return modpow(modinv(a, modulus), -r, modulus)
     
