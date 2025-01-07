@@ -52,8 +52,6 @@ nav:
   - Overview: index.md
   - Examples:
       - E1: examples/ex1.md
-      - E2: examples/ex2.md
-      - E3: examples/ex3.md
   - API reference:
       - Types: api/types.md
       - Modules:
