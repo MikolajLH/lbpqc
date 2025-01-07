@@ -20,7 +20,7 @@ classifiers = [
     "Intended Audience :: Education",
     "Topic :: Security :: Cryptography",
 ]
-version = "0.1"
+version = "0.0.1"
 dependencies = ["numpy"]
 keywords = ["cryptography", "lattice", "NTRU", "LWE", "LWR", "GGH"]
 

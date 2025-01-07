@@ -1,28 +1,38 @@
 site_name: lbpqc - docs
-
-repo_url: https://github.com/mikolajlh/lbpqc
-repo_name: mikolajlh/lbpqc
+repo_url: https://github.com/mikolajlh/lbpqc/
 edit_uri: blob/main/docs/
+site_description: "Documentation for Python library for lattice based cryptography and cryptoanalysis"
+site_author: "Mikołaj Leonhardt"
 
-nav:
-  - Home: "index.md"
-  - Examples:
-      - examples/attacking_congruential_pkc.ipynb
-      - examples/attacking_discrete_knapsack_pkc.ipynb
-      - examples/constructing_and_attacking_GGH_pkc.ipynb
-      - examples/constructing_and_attacking_NTRU_pkc.ipynb
-  - Modules:
-      - Primitives: primitives.md
-validation:
-  absolute_links: warn
-  unrecognized_links: warn
-  anchors: warn
+plugins:
+  - search
+  - mkdocstrings
+
+watch:
+  - src
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://unpkg.com/katex@0/dist/katex.min.js
+  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
+
+extra_css:
+  - https://unpkg.com/katex@0/dist/katex.min.css
+
 theme:
   name: material
   icon:
     logo: material/shield-key
   font:
     text: Lato
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.indexes
   palette:
     # Palette toggle for light mode
     - scheme: default
@@ -38,32 +48,18 @@ theme:
         icon: material/weather-sunny
         name: Switch to light mode
 
-watch:
-  - src/lbpqc
-
-markdown_extensions:
-  - pymdownx.superfences
-  - pymdownx.highlight
-  - markdown.extensions.tables
-  - markdown.extensions.codehilite
-  - pymdownx.arithmatex:
-      generic: true
-
-extra_javascript:
-  - javascripts/katex.js
-  - https://unpkg.com/katex@0/dist/katex.min.js
-  - https://unpkg.com/katex@0/dist/contrib/auto-render.min.js
-
-extra_css:
-  - https://unpkg.com/katex@0/dist/katex.min.css
-
-plugins:
-  - search
-  - mkdocs-jupyter
-  - mkdocstrings:
-      default_handler: python
-      handlers:
-        python:
-          paths: [./src]
-          options:
-            show_root_heading: true
+nav:
+  - Overview: index.md
+  - Examples:
+      - E1: examples/ex1.md
+      - E2: examples/ex2.md
+      - E3: examples/ex3.md
+  - API reference:
+      - Types: api/types.md
+      - Modules:
+          - Modules: api/modules/index.md
+          - api/modules/integer.md
+          - api/modules/lattice.md
+          - api/modules/matrix.md
+          - api/modules/polynomial.md
+          - api/modules/rng.md
