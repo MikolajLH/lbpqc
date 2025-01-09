@@ -58,6 +58,7 @@ nav:
       - Subset sum PKC: examples/attacking_discrete_knapsack_pkc.ipynb
       - NTRU PKC: examples/constructing_and_attacking_NTRU_pkc.ipynb
       - GGH PKC: examples/constructing_and_attacking_GGH_pkc.ipynb
+      - LWE primary attack: examples/LWE_primary_attack.ipynb
   - API reference:
       - Types: api/types.md
       - Modules:
